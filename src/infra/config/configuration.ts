@@ -2,6 +2,7 @@ export default () => ({
   port: parseInt(process.env.PORT, 10) || 4000,
   groq: {
     apiKey: process.env.GROQ_API_KEY,
+    apiBase: process.env.GROQ_API_BASE || 'https://api.groq.com/openai/v1',
     whisperModel: process.env.GROQ_WHISPER_MODEL || 'whisper-large-v3-turbo',
     chatModel: process.env.GROQ_CHAT_MODEL || 'llama-3.3-70b-versatile',
   },

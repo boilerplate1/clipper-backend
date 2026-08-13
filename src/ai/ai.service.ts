@@ -6,8 +6,6 @@ import { transcriptPrompt } from './prompt';
 
 const NON_RETRYABLE_STATUS = new Set([400, 403, 404]);
 
-const GROQ_API_BASE = 'https://api.groq.com/openai/v1';
-
 /**
  * Error thrown to the caller. `code` is a stable, leak-free identifier
  * (e.g. "AI_429") that the frontend translates to a localized message.
@@ -61,11 +59,13 @@ function extractHighlights(parsed: any): any[] | null {
 export class AiService {
   private readonly logger = new Logger(AiService.name);
   private groqApiKey: string;
+  private groqApiBase: string;
   private groqWhisperModel: string;
   private groqChatModel: string;
 
   constructor(private configService: ConfigService) {
     this.groqApiKey = this.configService.get<string>('groq.apiKey') || '';
+    this.groqApiBase = this.configService.get<string>('groq.apiBase') || 'https://api.groq.com/openai/v1';
     this.groqWhisperModel = this.configService.get<string>('groq.whisperModel') || 'whisper-large-v3-turbo';
     this.groqChatModel = this.configService.get<string>('groq.chatModel') || 'llama-3.3-70b-versatile';
   }
@@ -193,7 +193,7 @@ export class AiService {
       path.basename(audioPath),
     );
 
-    const res = await fetch(`${GROQ_API_BASE}/audio/transcriptions`, {
+    const res = await fetch(`${this.groqApiBase}/audio/transcriptions`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${this.groqApiKey}` },
       body: form,
@@ -216,7 +216,7 @@ export class AiService {
   }
 
   private async groqChat(prompt: string): Promise<any> {
-    const res = await fetch(`${GROQ_API_BASE}/chat/completions`, {
+    const res = await fetch(`${this.groqApiBase}/chat/completions`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${this.groqApiKey}`,
