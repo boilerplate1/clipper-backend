@@ -45,7 +45,7 @@ services:
         condition: service_healthy
 
   worker:
-    build: ../worker
+    build: ../../worker
     container_name: clipper_worker
     restart: unless-stopped
     environment:
