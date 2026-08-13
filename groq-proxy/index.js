@@ -18,10 +18,18 @@ export default {
       headers.delete(h);
     }
 
+    const body =
+      request.method === 'GET' || request.method === 'HEAD'
+        ? undefined
+        : await request.arrayBuffer();
+    if (body !== undefined) {
+      headers.set('Content-Length', String(body.byteLength));
+    }
+
     return fetch(target, {
       method: request.method,
       headers,
-      body: request.body,
+      body,
       redirect: 'follow',
     });
   },
