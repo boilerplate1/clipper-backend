@@ -34,7 +34,6 @@ services:
     environment:
       PORT: 4000
       GROQ_API_KEY: ${GROQ_API_KEY:?set GROQ_API_KEY in .env}
-      GROQ_API_BASE: ${GROQ_API_BASE:-https://api.groq.com/openai/v1}
       RABBITMQ_URI: amqp://guest:guest@rabbitmq:5672/
       DATABASE_URL: postgresql://clipper:${POSTGRES_PASSWORD:-clipper}@postgres:5432/clipper?schema=public
     ports:

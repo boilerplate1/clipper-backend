@@ -59,13 +59,11 @@ function extractHighlights(parsed: any): any[] | null {
 export class AiService {
   private readonly logger = new Logger(AiService.name);
   private groqApiKey: string;
-  private groqApiBase: string;
   private groqWhisperModel: string;
   private groqChatModel: string;
 
   constructor(private configService: ConfigService) {
     this.groqApiKey = this.configService.get<string>('groq.apiKey') || '';
-    this.groqApiBase = this.configService.get<string>('groq.apiBase') || 'https://api.groq.com/openai/v1';
     this.groqWhisperModel = this.configService.get<string>('groq.whisperModel') || 'whisper-large-v3-turbo';
     this.groqChatModel = this.configService.get<string>('groq.chatModel') || 'llama-3.3-70b-versatile';
   }
@@ -193,7 +191,7 @@ export class AiService {
       path.basename(audioPath),
     );
 
-    const res = await fetch(`${this.groqApiBase}/audio/transcriptions`, {
+    const res = await fetch(`https://api.groq.com/openai/v1/audio/transcriptions`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${this.groqApiKey}` },
       body: form,
@@ -216,7 +214,7 @@ export class AiService {
   }
 
   private async groqChat(prompt: string): Promise<any> {
-    const res = await fetch(`${this.groqApiBase}/chat/completions`, {
+    const res = await fetch(`https://api.groq.com/openai/v1/chat/completions`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${this.groqApiKey}`,
