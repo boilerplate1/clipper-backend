@@ -2,6 +2,8 @@
 set -euo pipefail
 
 # Quick VPS deployment: backend + worker + RabbitMQ + Postgres in Docker.
+# - pulls latest worker and backend from git (worker first, hard reset)
+# - rebuilds and starts the stack
 # Usage: bash deploy.sh [/opt/clipper]
 
 BASE_DIR="${1:-/opt/clipper}"
@@ -18,11 +20,18 @@ command -v docker >/dev/null 2>&1 || {
 
 echo "==> Cloning repos"
 mkdir -p "$BASE_DIR"
-[ -d "$BACKEND_DIR/.git" ] || git clone https://github.com/boilerplate1/clipper-backend.git "$BACKEND_DIR"
 [ -d "$WORKER_DIR/.git" ]  || git clone https://github.com/boilerplate1/clipper-worker.git  "$WORKER_DIR"
+[ -d "$BACKEND_DIR/.git" ] || git clone https://github.com/boilerplate1/clipper-backend.git "$BACKEND_DIR"
 
-cd "$BACKEND_DIR"; git pull --ff-only 2>/dev/null || true
-cd "$WORKER_DIR";  git pull --ff-only 2>/dev/null || true
+echo "==> Updating worker from git"
+cd "$WORKER_DIR"
+git fetch origin
+git reset --hard origin/master
+
+echo "==> Updating backend from git"
+cd "$BACKEND_DIR"
+git fetch origin
+git reset --hard origin/master
 
 echo "==> Environment"
 if [ ! -f "$DEPLOY_DIR/.env" ]; then
