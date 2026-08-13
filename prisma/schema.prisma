@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Job {
+  id         String      @id
+  url        String
+  title      String?
+  clipsCount String      @map("clips_count")
+  status     String      @default("PENDING")
+  progress   Int         @default(0)
+  logs       Json        @default("[]")
+  videoUrl   String?     @map("video_url")
+  crop9x16   Boolean     @default(true) @map("crop_9x16")
+  thumbnail  String?
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime    @updatedAt @map("updated_at")
+  highlights Highlight[]
+
+  @@map("jobs")
+}
+
+model Highlight {
+  id                 Int     @id @default(autoincrement())
+  jobId              String  @map("job_id")
+  idx                Int     @default(0)
+  startTs            String? @map("start_ts")
+  endTs              String? @map("end_ts")
+  title              String?
+  reason             String?
+  hookSentence       String? @map("hook_sentence")
+  viralityScore      Int?    @map("virality_score")
+  viralityPrediction String? @map("virality_prediction")
+  clipUrl            String? @map("clip_url")
+  job                Job     @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@unique([jobId, idx])
+  @@map("highlights")
+}
