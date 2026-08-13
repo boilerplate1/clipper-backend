@@ -41,9 +41,18 @@ if [ ! -f "$DEPLOY_DIR/.env" ]; then
   exit 1
 fi
 
+GPU_FILES=""
+if command -v nvidia-smi >/dev/null 2>&1; then
+  echo "==> NVIDIA GPU detected - enabling h264_nvenc for worker"
+  GPU_FILES="-f docker-compose.yml -f docker-compose.gpu.yml"
+else
+  echo "==> No NVIDIA GPU detected - worker uses CPU (libx264)"
+  GPU_FILES="-f docker-compose.yml"
+fi
+
 echo "==> Starting stack"
 cd "$DEPLOY_DIR"
-docker compose up -d --build
+docker compose $GPU_FILES up -d --build
 
 IP=$(hostname -I 2>/dev/null | awk '{print $1}')
 echo
